@@ -60,7 +60,39 @@ if(isset($_POST['submit']))
 		//echo "Found: ".$fppCount." FPP instances <br/> \n";
 		echo "<table border=\"1\" cellspacing=\"3\" cellpadding=\"3\"> \n";
 		
-		for($i=0;$i<=$fppCount;$i++) {
+		echo "<tr> \n";
+		echo "<td> \n";
+		echo "HOST \n";
+		echo "</td> \n";
+		
+		echo "<td> \n";
+		echo "IP \n";
+		echo "</td> \n";
+		echo "<td> \n";
+		echo "FPP Mode \n";
+		echo "</td> \n";
+		echo "<td> \n";
+		echo "Platform \n";
+		echo "</td> \n";
+		echo "<td> \n";
+		echo "Running Version \n";
+		echo "</td> \n";
+		
+		echo "<td> \n";
+		echo "Local Git Version \n";
+		echo "</td> \n";
+		
+		echo "<td> \n";
+		echo "Local Running Branch \n";
+		echo "</td> \n";
+		
+		echo "<td> \n";
+		echo "Remote Git Version <br/> Available for platform \n";
+		echo "</td> \n";
+		
+		echo "</tr> \n";
+		
+		for($i=0;$i<=$fppCount-1;$i++) {
 		echo "<tr> \n";	
 			$fppName = $fppSystems[$i]->HostName;
 			$fppIP = $fppSystems[$i]->IP;
@@ -93,16 +125,27 @@ if(isset($_POST['submit']))
 			
 			echo "<td> \n";
 			$command = "git --git-dir=".$fppInstallLocation."/.git/ rev-parse --short HEAD";
-			$result = runRemoteSSHCMD($fppIP, "pi", $command);
-			echo $result;
+			$local_git = runRemoteSSHCMD($fppIP, "pi", $command);
+			echo $local_git;
 			//echo '</pre>';
 			echo "</td> \n";
 			
 			echo "<td> \n";
 			//command that will be run on server B
 			$command = "git --git-dir=".$fppInstallLocation."/.git/ branch --list | grep '\\*' | awk '{print \$2}'";
-			$result = runRemoteSSHCMD($fppIP, "pi", $command);
-			echo $result;
+			$git_branch = runRemoteSSHCMD($fppIP, "pi", $command);
+			echo $git_branch;
+			//echo '</pre>';
+			echo "</td> \n";
+			
+			echo "<td> \n";
+			$command = "git ls-remote --heads https://github.com/FalconChristmas/fpp | grep 'refs/heads/$git_branch\$' | awk '$1 > 0 { print substr($1,1,7)}'";
+			$remote_git = runRemoteSSHCMD($fppIP, "pi", $command);
+			//$remote_git = "1234";
+			if($local_git != $remote_git) {
+				echo "<a href=\"http://".$fppIP."/about.php\">UPDATE</a> <br/>\n";
+			}
+			echo $remote_git;
 			//echo '</pre>';
 			echo "</td> \n";
 			echo "</tr> \n";
